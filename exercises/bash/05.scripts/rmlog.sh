@@ -51,7 +51,7 @@ for i in $(seq 1 $#); do
         if [ $(ls $arg | wc -l) -eq 0 ]; then
             echo "[$(date '+%Y-%m-%d %H:%M:%S')] Removed empty directory $arg" >> $RMLOG_FILE
             rmdir $arg
-            elif [ $rec -eq 1 ]; then
+        elif [ $rec -eq 1 ]; then
             rm -r $arg
             echo "[$(date '+%Y-%m-%d %H:%M:%S')] Removed directory recursively $arg" >> $RMLOG_FILE
         else
