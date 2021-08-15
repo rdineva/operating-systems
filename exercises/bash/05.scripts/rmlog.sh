@@ -47,7 +47,7 @@ for i in $(seq 1 $#); do
     if [ -f $arg ]; then
         echo "[$(date '+%Y-%m-%d %H:%M:%S')] Removed file $arg" >> $RMLOG_FILE
         rm $arg
-        elif [ -d $arg ]; then
+    elif [ -d $arg ]; then
         if [ $(ls $arg | wc -l) -eq 0 ]; then
             echo "[$(date '+%Y-%m-%d %H:%M:%S')] Removed empty directory $arg" >> $RMLOG_FILE
             rmdir $arg
