@@ -44,9 +44,9 @@ while read -p "Guess? " number; do
     if [ $number -eq $rand ]; then
         echo "Guessing correctly took you $tries tries!"
         break
-        elif [ $number -gt $rand ]; then
+    elif [ $number -gt $rand ]; then
         echo "...smaller!"
-        elif [ $number -lt $rand ]; then
+    elif [ $number -lt $rand ]; then
         echo "...bigger!"
     fi
 done
