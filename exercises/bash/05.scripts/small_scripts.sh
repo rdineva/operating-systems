@@ -22,7 +22,7 @@ echo “Hello, $1”
 # Да се напише shell скрипт, който приема точно един параметър и проверява дали подаденият му параметър се състои само от букви и цифри.
 if [ $# -lt 1 ]; then
     echo "Not enough params provided!"
-    elif [ $# -gt 1 ]; then
+elif [ $# -gt 1 ]; then
     echo "Too many params!"
 else
     [[ $1 =~ ^[0-9A-Za-z]*$ ]] && echo "true" || echo "false"
