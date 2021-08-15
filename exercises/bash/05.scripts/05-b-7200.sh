@@ -28,7 +28,7 @@ for i in $(seq 1 $cnt); do
                 echo $file
             fi
         done
-        elif [ -f $arg ]; then
+    elif [ -f $arg ]; then
         if [ -r $arg ]; then
             echo $arg
         fi
