@@ -17,8 +17,19 @@ cut -f 1,5 -d ":" /etc/passwd
 # Изведете съдържанието на файла /etc/passwd от 2-ри до 6-ти символ.
 cut -c 2-6 /etc/passwd | head -n 1
 
+# 03-a-0212
+# Отпечатайте потребителските имена и техните home директории от /etc/passwd.
+cut -d: -f1,6 /etc/passwd
+
+# 03-a-0213
+# Отпечатайте втората колона на /etc/passwd, разделена спрямо символ '/'.
+cut -d'/' -f2 /etc/passwd
+
 # 03-a-1500
-# Намерете броя на символите в /etc/passwd. А колко реда има в /etc/passwd?
+# Изведете броя на байтовете в /etc/passwd.
+# Изведете броя на символите в /etc/passwd.
+# Изведете броя на редовете  в /etc/passwd.
+wc -c /etc/passwd
 wc -m /etc/passwd
 wc -l /etc/passwd
 
