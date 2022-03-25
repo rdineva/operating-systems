@@ -99,6 +99,15 @@ cp $(find /etc -type f -perm -444) myetc/
 # от предната задача: когато вече сте получили bin2 с команди, архивирайте всички команди вътре, които започват с b в архив, който се казва b_start.tar. (командата, която архивира е tar -c -f <файл1> <файл2>...)
 tar -cf b_start.tar $(ls bin2 | grep '^b.*' | sed 's/^\(.*\)/bin2\/\1/g' | tr '\n' ' ')
 
+# 02-a-9000
+от предната задача: когато вече сте получили myetc с файлове, архивирайте
+всички от тях, които започват с 'c' в архив, който се казва c_start.tar
+изтрийте директорията myetc и цялото и съдържание
+изтрийте архива c_start.tar
+tar -cf c_start.tar $(find myetc/ -type f -name "c*")
+rm -r myetc/
+rm c_start.tar 
+
 # 02-a-9500
 # Използвайки едно извикване на командата find, отпечатайте броя на редовете във всеки обикновен файл в /etc директорията.
 find /etc -maxdepth 1 -type f -exec wc -l {} \;
@@ -106,3 +115,5 @@ find /etc -maxdepth 1 -type f -exec wc -l {} \;
 # 02-b-4000
 # Копирайте най-големия файл от тези, намиращи се в /etc, в home директорията си.
 cp $(wc -c $(find /etc -maxdepth 1 -type f) 2> /dev/null | sort -n -k 1 | tail -n 2 | head -n 1 | cut -d " " -f 3) .
+alternative: 
+cp $(find /etc/ -type f -exec wc -c {} \; 2> /dev/null | sort -n -k1 | head -n 1 | cut -d " " -f2) .
