@@ -171,7 +171,7 @@ awk '{ sum+=$2 + $3 } END { print sum }' file
 
 # 03-b-0300
 # Намерете само Group ID-то си от файлa /etc/passwd.
-egrep "s<fn>" | /etc/passwd | cut -d ":" -f 4
+grep "^s<fn>" /etc/passwd | cut -d: -f4
 
 # 03-b-3000
 # Запазете само потребителските имена от /etc/passwd във файл users във вашата home директория.
@@ -189,14 +189,15 @@ find /bin -type f | xargs file | grep 'shell script' | wc -l
 
 # 03-b-3600
 # Направете списък с директориите на вашата файлова система, до които нямате достъп. Понеже файловата система може да е много голяма, търсете до 3 нива на дълбочина.
-find / -maxdepth 3 -type d 1> /dev/null 2> errors
-cat errors | cut -d : -f 2 | tr -d '‘’ '
+find / -maxdepth 3 -type d ! -readable 2> /dev/null
 
 # 03-b-4000
 # Създайте следната файлова йерархия в home директорията ви:
 # dir5/file1
 # dir5/file2
 # dir5/file3
+mkdir dir5
+touch dir5/file{1,2,3}
 
 # Посредством vi въведете следното съдържание:
 # file1:
@@ -222,43 +223,47 @@ cat errors | cut -d : -f 2 | tr -d '‘’ '
 
 # Изведете на екрана:
 #     * статистика за броя редове, думи и символи за всеки един файл
-#     * статистика за броя редове и символи за всички файлове
-#     * общия брой редове на трите файла
-rmdir dir5
-touch dir5/file{1,2,3}
 wc file1
 wc file2
 wc file3
+#     * статистика за броя редове и символи за всички файлове
 wc -ml file{1,2,3}
-wc file{1,2,3}
+#     * общия брой редове на трите файла
+cat dir5/file{1,2,3} | wc -l
 
-# 03-b-4001
-# Във file2 подменете всички малки букви с главни.
-sed 's/\(.*\)/\U\1/g' dir5/file2
+
+# 03-b-4001 v2022
+# Във file2 (inplace) подменете всички малки букви с главни.
+sed -i 's/\(.*\)/\U\1/g' dir5/file2
 
 # 03-b-4002
-# Във file3 изтрийте всички "1"-ци.
-sed '/1/d' dir5/file3
+# Във file3 (inplace) изтрийте всички "1"-ци.
+sed -i '/1/d' dir5/file3
 
 # 03-b-4003
 # Изведете статистика за най-често срещаните символи в трите файла.
-find dir5/file{1,2,3} | xargs -I % sh -c 'sed "s/./\0\n/g" % | sed "/^$/d" | sort | uniq -c | sort -n | tail -n 1'
+sed 's/\(.\)/\1\n/g' dir5/file{1,2,3} | awk 'NF' | sort | uniq -c | sort
+older: find dir5/file{1,2,3} | xargs -I % sh -c 'sed "s/./\0\n/g" % | sed "/^$/d" | sort | uniq -c | sort -n | tail -n 1'
 
 # 03-b-4004
 # Направете нов файл с име по ваш избор, който е конкатенация от file{1,2,3}.
-cat dir5/file{1,2,3} >> newfile
+cat dir5/file{1,2,3} > file
 
 # 03-b-4005
 # Прочетете текстов файл file1 и направете всички главни букви малки като запишете резултата във file2.
-sed 's/\(.*\)/\U\1/g' dir5/file2 >> dir5/file1
+sed 's/\(.\)/\L\1/g' dir5/file2 >> dir5/file1
 
 # 03-b-5200
 # Изтрийте всички срещания на буквата 'a' (lower case) в /etc/passwd и намерете броят на оставащите символи.
 tr -d a < /etc/passwd | wc -m
 
+# 03-b-5200 v2022
+# Намерете броя на символите, различни от буквата 'а' във файла /etc/passwd
+sed 's/\([^a]\)/\1\n/g' /etc/passwd | awk 'NF' | wc -l
+
 # 03-b-5300
 # Намерете броя на уникалните символи, използвани в имената на потребителите от /etc/passwd.
-cut -d : -f 5 /etc/passwd | cut -d , -f 1 | tr -d ' \n' | sed 's/./\0\n/g' | sort  | uniq -c | sort -n
+sed 's/\(.\)/\1\n/g' /etc/passwd | awk 'NF' | sort | uniq | wc -l
 
 # 03-b-5400
 # Отпечатайте всички редове на файла /etc/passwd, които не съдържат символния низ 'ov'.
