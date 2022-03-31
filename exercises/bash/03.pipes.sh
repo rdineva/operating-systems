@@ -271,23 +271,36 @@ grep -v 'ov' /etc/passwd
 
 # 03-b-6100
 # Отпечатайте последната цифра на UID на всички редове между 28-ми и 46-ред в /etc/passwd.
-cat /etc/passwd | head -n 46 | tail -n 18 | cut -d : -f 3 | egrep -o '.$'
+head -n 46 /etc/passwd  | tail -n 19 | cut -d: -f3 | egrep -o '[0-9]$'
 
 # 03-b-6700
 # Отпечатайте правата (permissions) и имената на всички файлове, до които имате read достъп, намиращи се в директорията /tmp. (hint: 'man find', вижте -readable)
-find /tmp/ -readable -type f 2> /dev/null | ls -l | awk '{print $1 " " $9}'
+find /tmp -type f -readable -exec ls -l {} \; 2> /dev/null | cut -d" " -f1,9
 
 # 03-b-6900
 # Намерете имената на 10-те файла във вашата home директория, чието съдържание е редактирано най-скоро. На първо място трябва да бъде най-скоро редактираният файл. Намерете 10-те най-скоро достъпени файлове. (hint: Unix time)
 ls -tl | head -n 10
 ls -ltu | head -n 10
+# -t sorts by time, newest first
+other solutions:
+find . -type f -exec stat --format="%Y %n" {} \; | sort -rn -k1 | head -n 10 | cut -d" " -f2
+find . -type f -exec stat --format="%X %n" {} \; | sort -rn -k1 | head -n 10 | cut -d" " -f2
 
 # 03-b-7000
 # Файловете, които съдържат C код, завършват на `.c`.
 # Колко на брой са те във файловата система (или в избрана директория)?
-# Колко реда C код има в тези файлове?
 find . -type f -name "^*.c$" | wc -l
+# Колко реда C код има в тези файлове?
 find . -type f -name "^*.c$" | xargs -I % sh -c 'wc -m %'
+
+# 03-b-7000 v2022
+# да приемем, че файловете, които съдържат C код, завършват на `.c` или `.h`.
+# Колко на брой са те в директорията `/usr/include`?
+find /usr/include/ -type f -regextype posix-extended -regex ".*\.(c|h)$" | wc -l
+# Колко реда C код има в тези файлове?
+find /usr/include/ -type f -regextype posix-extended -regex ".*\.(c|h)$" | xargs -I % sh -c 'wc -m %'
+общо редове за всички файлове:
+find /usr/include/ -type f -regextype posix-extended -regex ".*\.(c|h)$" | xargs -I % sh -c 'cat %' | wc -m
 
 # 03-b-7500
 # Даден ви е ASCII текстов файл (например /etc/services). Отпечатайте хистограма на N-те (например 10) най-често срещани думи.
