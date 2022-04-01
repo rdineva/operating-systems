@@ -315,7 +315,11 @@ cat /etc/services | sed 's/\(.\)/\L\1/g' | grep -o '[a-z]*' | sort | uniq -c | s
 
 # 03-b-8000
 # Вземете факултетните номера на студентите от СИ и ги запишете във файл si.txt сортирани.
-egrep -o '^s[[:digit:]]{5}' /etc/passwd | tr -d 's' | sort -n > si.txt
+egrep -o '^s[0-9]{5,6}' /etc/passwd | tr -d 's' | sort -n > si.txt
+
+# 03-b-8500
+# За всяка група от /etc/group изпишете "Hello, <група>", като ако това е вашата група, напишете "Hello, <група> - I am here!".
+awk -F: '{ printf "Hello, %s", $1 } $3 == 512 { printf " - I am here!" } { printf "\n"}' /etc/group 
 
 # 03-b-8520
 # Изпишете всички usernames от /etc/passwd с главни букви.
@@ -325,6 +329,15 @@ cut -d : -f 1 /etc/passwd | sed 's/\(.\)/\U\1/g'
 # Shell Script-овете са файлове, които по конвенция имат разширение .sh. Всеки такъв файл започва с "#!<interpreter>" , където <interpreter> указва на операционната система какъв интерпретатор да пусне (пр: "#!/bin/bash", "#!/usr/bin/python3 -u").
 # Намерете всички .sh файлове и проверете кой е най-често използваният интерпретатор.
 find / -name "*.sh" 2> /dev/null -type f | xargs -I % sh -c 'cat % | head -n 1' | sort | uniq -c | sort -n | tail -n 1
+
+# 03-b-8600 v2022
+# Shell Script-овете са файлове, които по конвенция имат разширение .sh. Всеки
+# такъв файл започва с "#!<interpreter>" , където <interpreter> указва на
+# операционната система какъв интерпретатор да пусне (пр: "#!/bin/bash",
+# "#!/usr/bin/python3 -u").
+# Намерете всички .sh файлове в директорията `/usr` и нейните поддиректории, и
+# проверете кой е най-често използваният интерпретатор.
+find /usr -type f -regextype posix-extended -regex ".*\.sh$" -exec sh -c "cat {} | head -n1" \; | grep '#!\/.*' | sort | uniq -c | sort -nr | head -n 1
 
 # 03-b-8700
 # Намерете 5-те най-големи групи подредени по броя на потребителите в тях.
