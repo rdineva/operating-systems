@@ -340,12 +340,16 @@ find / -name "*.sh" 2> /dev/null -type f | xargs -I % sh -c 'cat % | head -n 1' 
 find /usr -type f -regextype posix-extended -regex ".*\.sh$" -exec sh -c "cat {} | head -n1" \; | grep '#!\/.*' | sort | uniq -c | sort -nr | head -n 1
 
 # 03-b-8700
-# Намерете 5-те най-големи групи подредени по броя на потребителите в тях.
-cut -d : -f 4 /etc/passwd | sort -n | uniq -c | sort -n | tail -n 5
+# 1. Изведете GID-овете на 5-те най-големи групи спрямо броя потребители, за които
+# съответната група е основна (primary).
+cut -d: -f4 /etc/passwd | sort | uniq -c | sort -nr | head -5 | awk '{print $2}'
+# 2. (*) Изведете имената на съответните групи.
+cut -d: -f4 /etc/passwd | sort | uniq -c | sort -nr | head -5 | awk '{print $2}' | xargs -I % sh -c 'getent group %' | cut -d: -f1
+# Hint: /etc/passwd
 
 # 03-b-9000
 # Направете файл eternity. Намерете всички файлове, които са били модифицирани в последните 15мин (по възможност изключете .).  Запишете във eternity името на файла и часa на последната промяна.
-find / -type f -mtime -15 ! -name "." -exec ls -l {} \; 2> /dev/null | cut -d ' ' -f 6,7,8,9 > eternity
+find . -mindepth 2 -type f -mmin -15 -exec stat --format="%n %Y" {} \; > eternity
 
 # 03-b-9050
 # Копирайте файл /home/tony/population.csv във вашата home директория.
@@ -353,59 +357,59 @@ cp /srv/os/fmi-os/exercises/data/population.csv .
 
 # 03-b-9051
 # Използвайки файл population.csv, намерете колко е общото население на света през 2008 година. А през 2016?
-grep ".*,.*,2008.*" population.csv | cut -d , -f 4 | awk 'BEGIN {count=0} {count+=$1} END {print count}'
-grep ".*,.*,2016.*" population.csv | cut -d , -f 4 | awk 'BEGIN {count=0} {count+=$1} END {print count}'
+grep '^.*,.*,2008,.*$' pop | sed 's/.*,.*,.*,\(.*\)$/\1/g'| awk '{sum+=$0} END {print sum}'
+grep '^.*,.*,2016,.*$' pop | sed 's/.*,.*,.*,\(.*\)$/\1/g'| awk '{sum+=$0} END {print sum}'
 
 # 03-b-9052
 # Използвайки файл population.csv, намерете през коя година в България има най-много население.
-grep 'Bulgaria' population.csv | sort -n -t , -k 4 | tail -n 1 | cut -d , -f 3
+grep '^Bulgaria' pop | awk -F, '$4 > max {max=$4; year=$3} END {print year}'
+old: grep 'Bulgaria' population.csv | sort -n -t , -k 4 | tail -n 1 | cut -d , -f 3
 
 # 03-b-9053
-# Използвайки файл population.csv, намерете коя държава има най-много население през 2016. А коя е с най-малко население?
+# Използвайки файл population.csv, намерете коя държава има най-много население през 2016. 
+grep '^.*,.*,2016,.*$' pop | sed 's/\(.*\),\(.*\),\(.*\),\(.*\)$/\1:\2:\3:\4/g' | awk -F: '$4 > max {max=$4; country=$1} END {print country}'
+# А коя е с най-малко население?
+grep '^.*,.*,2016,.*$' pop | sed 's/\(.*\),\(.*\),\(.*\),\(.*\)$/\1:\2:\3:\4/g' | awk -F: '$4 < min || length(min) == 0 {min=$4; country=$1} END {print country}'
 # (Hint: Погледнете имената на държавите)
-grep '.*,.*,2016.*' population.csv | sort -n -t , -k 4 | tail -n 1 | cut -d , -f 1,2
 
 # 03-b-9054
 # Използвайки файл population.csv, намерете коя държава е на 42-ро място по население през 1969. Колко е населението й през тази година?
-grep '.*,.*,1969.*' population.csv | sort -n -t , -k 4 | tail -n 43 | head -n 1 | cut -d , -f 1
-grep '.*,.*,1969.*' population.csv | sort -n -t , -k 4 | tail -n 43 | head -n 1 | cut -d , -f 1 | xargs -I % sh -c 'egrep '%,.*,2016.*' population.csv' | cut -d , -f 4
+grep '^.*,.*,1969,.*$' pop | sed 's/\(.*\),\(.*\),\(.*\),\(.*\)$/\1:\2:\3:\4/g' | sort -k4 -t: -nr | head -n 42 | tail -n 1 | cut -d: -f1
+grep '^.*,.*,1969,.*$' pop | sed 's/\(.*\),\(.*\),\(.*\),\(.*\)$/\1:\2:\3:\4/g' | sort -k4 -t: -nr | head -n 42 | tail -n 1 | cut -d: -f1 | xargs -I % sh -c 'grep "^%,.*,2016.*" pop | grep -o "[0-9\.]*$"'
 
 # 03-b-9100
 # В home директорията си изпълнете командата `curl -o songs.tar.gz "http://fangorn.uni-sofia.bg/misc/songs.tar.gz"`
 
 # 03-b-9101
 # Да се разархивира архивът songs.tar.gz в папка songs във вашата home директорията.
-tar -xzf songs.tar.gz -C ./songs
+tar -xf songs.tar.gz -C songs
 
 # 03-b-9102
 # Да се изведат само имената на песните.
 ls songs/ | cut -d - -f 2 | cut -d '(' -f 1 | sed 's/^ \(.*\)/\1/g'
+v2022: ls | cut -d- -f2 | cut -d'(' -f1 | xargs -I % sh -c 'echo -n %; echo'
 
 # 03-b-9103
 # Имената на песните да се направят с малки букви, да се заменят спейсовете с долни черти и да се сортират.
 ls songs/ | cut -d - -f 2 | cut -d '(' -f 1 | sed 's/^ \(.*\)/\1/g' | sed 's/\(.\)/\L\1/g' | sed '/^$/d'| tr ' ' '_' | sort
+v2022: ls | cut -d- -f2 | cut -d'(' -f1 | xargs -I % sh -c 'echo -n %; echo' | sed 's/\(.*\)/\L\1/g' | tr ' ' '_' | sort 
 
 # 03-b-9104
 # Да се изведат всички албуми, сортирани по година.
-ls songs/ | cut -d - -f 2 | cut -d '(' -f 2 | sed 's/\(.*\)).ogg/\1/g' | sort -n -t , -k 2
+ls | sed 's/.*(\(.*\)).*/\1/g' | sort -t, -n -k2
 
 # 03-b-9105
 # Да се преброят/изведат само песните на Beatles и Pink.
-ls songs/ | grep '[Beatles|Pink] -.*' | wc -l
+ls | grep '\(Beatles\|Pink\) -' | wc -l
 
 # 03-b-9106
 # Да се направят директории с имената на уникалните групи. За улеснение, имената от две думи да се напишат слято:
 # Beatles, PinkFloyd, Madness
-ls songs/ | cut -d - -f 1 | tr -d ' ' | sort -u | xargs -I % sh -c 'mkdir %'
+ls | sed 's/\(.*\) -.*/\1/g' | sort | uniq | tr -d ' ' | xargs -I % sh -c 'mkdir %'
 
 # 03-b-9200
 # Напишете серия от команди, които извеждат детайли за файловете и директориите в текущата директория, които имат същите права за достъп както най-големият файл в /etc директорията.
-# Най-голям файл: 
-find /etc/ -type f -exec wc -c {} \; 2> /dev/null | sort -n -k 1 | tail -n 1 | cut -d ' ' -f 2
-# File permissions:  
-ls -l $(find /etc/ -type f -exec wc -c {} \; 2> /dev/null | sort -n -k 1 | tail -n 1 | cut -d ' ' -f 2) | cut -d ' ' -f 1
-# and final:
-find . -type f -exec ls -l {} \; | egrep "$(ls -l $(find /etc/ -type f -exec wc -c {} \; 2> /dev/null | sort -n -k 1 | tail -n 1 | cut -d ' ' -f 2) | cut -d ' ' -f 1).*"
+find . -perm $(find /etc/ -type f -exec stat --format="%n %s %a" {} 2> /dev/null \; | sort -n -k2 | tail -n 1 | cut -d' ' -f3)
 
 # 03-b-9300
 # Дадени са ви 2 списъка с email адреси - първият има 12 валидни адреса, а вторията има само невалидни. Филтрирайте всички адреси, така че да останат само валидните. Колко кратък регулярен израз можете да направите за целта?
@@ -441,3 +445,12 @@ find . -type f -exec ls -l {} \; | egrep "$(ls -l $(find /etc/ -type f -exec wc 
 # this\ is"really"not\allowed@example.com
 
 ^([a-zA-Z-_0-9]\.?){1,}[^.]@[a-zA-Z0-9]{1,}-?[a-zA-Z0-9]*\.([[:word:]]\.?){1,}
+
+
+# 03-b-9400
+# Посредством awk, използвайки emp.data (от 03-a-6000.txt) за входнни данни,
+# изведете:
+# - всеки ред, като полетата са в обратен ред
+# (Разгледайте for цикли в awk)
+
+awk '{ for (i=NF; i>=1; i--) { printf $i " "; if (i==1) printf "\n" }}' emp
