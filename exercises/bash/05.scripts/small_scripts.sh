@@ -47,6 +47,7 @@ w | grep "^$usr " | wc -l
 
 # old: echo $(w | grep "$1.*" | wc -l)
 
+
 # 05-b-3200
 # Да се напише shell скрипт, който приканва потребителя да въведе пълното име на директория и извежда на стандартния изход подходящо съобщение за броя на всички файлове и всички директории в нея.
 #!/bin/bash
@@ -63,13 +64,37 @@ dirs=$(find $1 -type d | wc -l)
 files=$(find $1 -type f | wc -l)
 echo -e "In directory $1:\nDirectories - $dirs \nFiles - $files"
 
+
 # 05-b-3300
 # Да се напише shell скрипт, който чете от стандартния вход имената на 3 файла, обединява редовете на първите два (man paste), подрежда ги по азбучен ред и резултата записва в третия файл.
-paste -s $1 $2 | sort > $3
+#!/bin/bash
+if [ ! $# -eq 3 ]; then
+	echo "ERROR: 3 params needed"
+	exit 1
+fi
+
+if [ ! -f $1 ] || [ ! -f $2 ]; then
+	echo "ERROR: $1 and/or $2 aren't files"
+	exit 2
+fi
+
+paste $1 $2 | sort > $3
+
 
 # 05-b-3400
 # Да се напише shell скрипт, който чете от стандартния вход име на файл и символен низ, проверява дали низа се съдържа във файла и извежда на стандартния изход кода на завършване на командата с която сте проверили наличието на низа.
 # NB! Символният низ може да съдържа интервал (' ') в себе си.
-result=$(grep ".*$1.*" $2)
+#!/bin/bash
+if [ ! $# -eq 2 ]; then
+	echo "ERROR: 2 params needed"
+	exit 1
+fi
+
+if [ ! -f $1 ]; then
+	echo "ERROR: $1 is not a file"
+	exit 2
+fi
+
+result=$(grep "$2" $1)
 echo $?
 [[ $(echo -e $result | wc -l) -gt 0 ]] && echo "true" || echo "false"
