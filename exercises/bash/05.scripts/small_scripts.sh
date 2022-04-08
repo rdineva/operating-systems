@@ -31,13 +31,37 @@ fi
 
 # 05-b-3100
 # Да се напише shell скрипт, който приканва потребителя да въведе низ - потребителско име на потребител от системата - след което извежда на стандартния изход колко активни сесии има потребителят в момента.
-echo $(w | grep "$1.*" | wc -l)
+v2022:
+#!/bin/bash
+
+if [ ! $# -eq 1 ]; then
+	echo "ERROR: 1 param needed"
+	exit 1
+elif ! id -u "$1" &> /dev/null; then
+	echo "ERROR: user doesn't exist"
+	exit 2
+fi
+
+usr=$1
+w | grep "^$usr " | wc -l 
+
+# old: echo $(w | grep "$1.*" | wc -l)
 
 # 05-b-3200
 # Да се напише shell скрипт, който приканва потребителя да въведе пълното име на директория и извежда на стандартния изход подходящо съобщение за броя на всички файлове и всички директории в нея.
+#!/bin/bash
+
+if [ ! $# -eq 1 ]; then
+	echo "ERROR: one param needed"
+	exit 1
+elif [ ! -d "$1" ]; then
+	echo "ERROR: $1 is not a directory"
+	exit 2
+fi
+
 dirs=$(find $1 -type d | wc -l)
 files=$(find $1 -type f | wc -l)
-echo -e "dirs:files\n$dirs:$files"
+echo -e "In directory $1:\nDirectories - $dirs \nFiles - $files"
 
 # 05-b-3300
 # Да се напише shell скрипт, който чете от стандартния вход имената на 3 файла, обединява редовете на първите два (man paste), подрежда ги по азбучен ред и резултата записва в третия файл.
