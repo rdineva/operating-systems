@@ -7,11 +7,8 @@
 # извежда по подходящ начин на стандартния изход броя на редовете, които съдържат низа.
 # NB! Низът може да съдържа интервал.
 
-cnt=$#
-
-for i in $(seq 1 $cnt); do
-    arg=$(eval echo \${$i})
-    if [ ! -f $arg ]; then
+for i in "$@"; do
+    if [ ! -f "$i" ]; then
         echo "ERROR: $arg is not a file"
         exit 1
     fi
@@ -19,6 +16,7 @@ done
 
 read -p "Enter string: " str
 
-for i in $(seq 1 $cnt); do
-    grep "$str" $(eval echo \${$i}) | wc -l
+for i in "$@"; do
+    echo -n "file $i: "
+    grep "$str" "$i" | wc -l
 done
