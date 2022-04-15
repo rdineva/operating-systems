@@ -13,15 +13,10 @@
 # $ ./nicenumber.sh 7632223 ,
 # 7,632,223
 
-if [ ! $# -eq 1 ] && [ ! $# -eq 2 ]; then
-    echo "ERROR: Incorrect number of params."
-    exit 1
-fi
+[ $# -ne 1 ] && [ $# -ne 2 ] && echo "ERROR: Incorrect number of params." && exit 1
 
 del=" "
 
-if [ $# -eq 2 ]; then
-    del=$2
-fi
+[ $# -eq 2 ] && del=$2
 
 echo $1 | rev | sed "s/.../&$del/g;s/$del$//" | rev
