@@ -28,3 +28,14 @@ find . -type f | while read line; do
         echo $line
     fi
 done
+
+### ANOTHER SOLUTION
+
+dir=$1
+original_file=$2
+
+find $dir -type f | while read file; do
+	[[ "$file" =~ "$original_file" ]] && continue
+	status=$(cmp --silent "$original_file" "$file"; echo $?) 
+	[ $status -eq 0 ] && echo $file
+done
