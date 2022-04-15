@@ -23,6 +23,21 @@
 # $ ./validint.sh asdf - 280; echo $?
 # 3
 
+[ ! $# -eq 3 ] && echo "ERROR: 3 args needed" && exit 4
+
+for i in $@; do
+	! [[ "$i" =~ ^[0-9]+$ ]] && echo "ERROR: $i is not an integer" && exit 3  
+done
+
+[ $3 -lt $2 ] && echo "ERROR: right interval side should be greater than the left one" && exit 2
+
+[ $1 -gt $3 ] || [ $1 -lt $2 ] && echo "ERROR: $1 is not in the interval [$2, $3]" && exit 1
+
+[ $1 -ge $2 ] && [ $1 -le $3 ] && echo "$1 is in the interval [$2, $3]" && exit 0 
+
+
+### OLDER SOLUTION
+
 if [ ! $# -eq 3 ]; then
     echo "ERROR: Incorrect number of params."
     exit 4
