@@ -12,6 +12,24 @@ if [ ! $# -ge 1 ]; then
     exit 1
 fi
 
+for i in "$@"; do    
+    if [ -d "$i" ]; then
+        files=$(find $i -maxdepth 1 -type f)
+        files_count=$(echo $files | wc -l)
+        
+        echo $files | tr ' ' '\n' | while read file; do
+            size=$(stat --format="%s" $file)
+            
+            [ $size -lt $files_count ] && echo $file
+        done
+	fi
+
+    [ -f "$i" ] && [ -r $arg ] && echo "$i"
+done
+
+
+### OLDER SOLUTION
+
 cnt=$#
 
 for i in $(seq 1 $cnt); do
