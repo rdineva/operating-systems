@@ -21,11 +21,11 @@ if ! [ $2 -eq $2 ]; then
     exit 3
 fi
 
-find $1 -maxdepth 1 -type f | xargs -I @ sh -c 'stat --format="%n %s" @' | while read line; do
-    name=$(echo $line | cut -d " " -f1)
-    size=$(echo $line | cut -d " " -f2)
-    
-    if [ $size -gt $2 ]; then
-        echo $name
-    fi
+dir=$1
+num=$2
+
+find $dir -maxdepth 1 -type f -exec stat --format="%n=%s" "{}" {} \; | while read line; do
+    name=$(echo $line | cut -d"=" -f1)
+    size=$(echo $line | cut -d"=" -f2)
+	[ $size -gt $num ] && echo $name
 done
