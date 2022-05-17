@@ -1,4 +1,5 @@
 // Реализирайте команда cp, работеща с произволен брой подадени входни параметри.
+// usage: ./main.c <file 1> <file 2> ... <file n> <dir>
 
 #include <stdio.h>
 #include <unistd.h>
@@ -8,9 +9,6 @@
 #include <fcntl.h>
 #include <err.h>
 
-// open f1
-// create f1 in dest
-// read from f1 and write to dest/f1
 
 int main(int argc, char* argv[]) {
     if (argc - 1 < 2) {
