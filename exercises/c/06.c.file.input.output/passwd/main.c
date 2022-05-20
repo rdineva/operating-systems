@@ -8,38 +8,33 @@
 #include <fcntl.h>
 #include <err.h>
 
-int main() {
-    int fd1 = open("/etc/passwd", O_RDONLY);
-    if (fd1 == -1) err(1, "%s", "/etc/passwd");
+int main(void) {
+	int fd1;
+	if ((fd1 = open("/etc/passwd", O_RDONLY)) == -1) {
+		err(1, "/etc/passwd");
+	}
+		
+	int fd2;
+	if ((fd2 = open("passwd", O_CREAT|O_TRUNC|O_RDWR, S_IRWXU)) == -1) {
+		err(1, "passwd");
+	}	
 
-    int fd2 = open("passwd", O_CREAT|O_WRONLY|O_TRUNC, S_IRWXU);
-    if (fd2 == -1) {
-        close(fd1);
-        err(1, "%s", "passwd");
-    }
+	ssize_t read_status;
+	ssize_t write_status;
+	char buff;
+	
+	while((read_status = read(fd1, &buff, 1)) && read_status != -1) {
+		if (buff == ':') buff = '?';
+		write_status = write(fd2, &buff, 1);
+		if (write_status == -1) break;
+	}
 
-    char buff;
-    char q = '?';
+	close(fd1);
+	close(fd2);
 
-    while (read(fd1, &buff, 1)) {
-        if (buff == ':') {
-            if (write(fd2, &q, 1) == -1) {
-                close(fd1);
-                close(fd2);
-                err(1, "error while writing");
-            }
+	if (read_status == -1 || write_status == -1) {
+		err(1, "err");
+	}
 
-            continue;
-        }
-
-        if (write(fd2, &buff, 1) == -1) {
-            close(fd1);
-            close(fd2);
-            err(1, "error while writing");
-        }
-    }
-
-    close(fd1);
-    close(fd2);
-    exit(0);
+	exit(0);
 }
