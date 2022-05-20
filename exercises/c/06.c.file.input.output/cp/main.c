@@ -25,22 +25,23 @@ int main(int argc, char* argv[]) {
         snprintf(file_path, sizeof file_path, "%s/%s", argv[argc-1], argv[i]);
 
         int fd2;
-        if ((fd2 = open(file_path, O_CREAT|O_WRONLY|O_TRUNC, S_IRWXU)) == -1) {
-                            
+        if ((fd2 = open(file_path, O_CREAT|O_WRONLY|O_TRUNC, S_IRWXU)) == -1) {     
+            close(fd1);
+			err(1, "%s", file_path);
         }
 
         char buff[4098];
-        ssize_t read_size;
-        while((read_size = read(fd1, &buff, sizeof(buff))) && read_size != -1) {            
-            if (write(fd2, &buff, read_size) == -1) {
-                close(fd1);
-                close(fd2);
-                err(1, "%s", argv[i]);
-            }
+        ssize_t read_status;		
+        ssize_t write_status;
+
+        while((read_status = read(fd1, &buff, sizeof(buff))) && read_status != -1) {            
+            write_status = write(fd2, &buff, read_status);
+			if (write_status == -1) break;
         }
 
         close(fd1);
         close(fd2);
+        if (read_status == -1 || write_status == -1) err(1, "%s", argv[i]);
     }
 
     exit(0);
