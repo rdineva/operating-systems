@@ -10,35 +10,24 @@
 #include <stdlib.h>
 
 int main(int argc, char* argv[]) {
-    if (argc-1 != 1) {
-    	errx(1, "1 arg needed");
-    }	    
+	if (argc != 2) errx(1, "err");
+	
+	int fd;
+	if ((fd = open(argv[1], O_RDONLY)) == -1) {
+		errx(1, "1 argg");
+	}
 
-	int fd1 = open(argv[1], O_RDONLY);
-    if (fd1 == -1) {
-        err(1, "%s", argv[1]);
-    }
+	char c;
+	int lines=0;
 
-    int fd2;
-    char c;
-    int lines = 0;
-    
-    while((fd2 = read(fd1, &c, 1)) && lines < 10) {
-        if (fd2 == -1) {
-			close(fd1);
-    		close(fd2);
-            err(1, "%s", argv[1]);
-        }
+	while(read(fd, &c, 1) && lines < 10) {
+		write(0, &c, 1);
+		if (c == '\n') {
+			lines++;
+		}
+	}
 
-	    if (c == '\n') {
-		    lines++;
-	    }
-
-        write(0, &c, 1);
-    }
-
-    close(fd1);
-    close(fd2);
-    exit(0);
+	close(fd);
+	exit(0);
 }
 
