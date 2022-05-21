@@ -1,4 +1,4 @@
-// Напишете програма, която приема точно 1 аргумента. Първият може да бъде само --min, --max или --print (вижте man 3 strcmp).
+// Напишете програма, която приема точно 2 аргумента. Първият може да бъде само --min, --max или --print (вижте man 3 strcmp).
 // Вторият аргумент е двоичен файл, в който има записани цели неотрицателни двубайтови числа (uint16_t - вижте man stdint.h). 
 // Ако първият аргумент е:
 //    --min - програмата отпечатва кое е най-малкото число в двоичния файл.
@@ -15,45 +15,39 @@
 #include <stdint.h>
 
 int main(int argc, char* argv[]) {
-    if (argc - 1 != 2) {
-        errx(1, "2 args needed");
-    }
+	if (argc != 3) errx(1, "ERROR: 3 args needed");
+	
+	if ((strcmp(argv[1], "--min") != 0) && 
+		(strcmp(argv[1], "--max") != 0) && 
+		(strcmp(argv[1], "--print") != 0)
+	) {
+		errx(1, "ERROR: invalid first arg");
+	}
 
-    int fd = open("dump", O_RDONLY);
-    if (fd == -1){
-        err(1, "%s", argv[1]);
-    }
+	int fd;
+	if ((fd = open(argv[2], O_RDONLY)) == -1) {
+		err(1, "%s", argv[2]);
+	}
 
-    uint16_t num; // 2 bytes int buffer
-    uint16_t max = 0;
-    uint16_t min = 65535;
-    ssize_t read_size = 0;
-    do {
-        read_size = read(fd, &num, sizeof(num));
-        if (read_size < 0) {
-            err(1, "Error reading %s", argv[2]);
-        }
-        
-        if (num > max) {
-            max = num;
-        } else if (num < min) {
-            min = num;
-        }
+	uint16_t min = 65535;
+	uint16_t max = 0;
+	uint16_t buff;
+	int read_status;
 
-        if (strcmp(argv[1], "--print") == 0) {
-           printf("uint16_t = %d \n", num); 
-        }
-    } while (read_size > 0);
+	while((read_status = read(fd, &buff, sizeof(buff))) && read_status != -1) {
+		if (buff < min) min = buff;
+		if (buff > max) max = buff;
+		if (strcmp(argv[1], "--print") == 0) printf("%d\n", buff);
+	}
+	
+	if (read_status == -1) {
+		close(fd);
+		err(1, "err");
+	}
 
+	if (strcmp(argv[1], "--min") == 0) printf("min=%d\n", min);
+   	if (strcmp(argv[1], "--max") == 0) printf("max=%d\n", max);
 
-    if (strcmp(argv[1], "--min") == 0) {
-        printf("min = %d \n", min);
-    } else if (strcmp(argv[1], "--max") == 0) {
-        printf("max = %d \n", max);
-    } else {
-        errx(1, "%s is not a valid arg", argv[1]);
-    }
-    
-    
-    exit(0);
+	close(fd);
+	exit(0);
 }
