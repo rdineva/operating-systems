@@ -14,7 +14,6 @@ int main(int argc, char* argv[]) {
         errx(1, "3 args needed");
     }
 
-
     for (int i = 1; i < argc; i++) {
         int pid = fork();
         int status;
@@ -29,6 +28,5 @@ int main(int argc, char* argv[]) {
         printf("%s executed successfully with exit status %d and pid %d\n", argv[i], status, child_pid);
     }
     
-
     exit(0);
 }
