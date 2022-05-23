@@ -13,12 +13,10 @@
 #include <stdlib.h>
 
 int main() {
-    
-    int fd = open("temp", O_CREAT | O_TRUNC | O_RDWR, S_IRWXU);
+    int fd = open("temp", O_CREAT | O_TRUNC | O_WRONLY, S_IRWXU);
     if (fd == -1) err(1, "couldn't create file temp");
 
     int pid = fork();
-
     if (pid == 0) {
         if (write(fd, "foo", 3) != 3) {
             err(1, "couldn't write foo");
