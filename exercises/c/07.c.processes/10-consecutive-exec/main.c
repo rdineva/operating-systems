@@ -9,16 +9,13 @@
 #include <stdlib.h>
 
 int main(int argc, char* argv[]) {
-    if (argc - 1 != 2) errx(1, "2 args needed");
+    if (argc != 3) errx(1, "2 args needed");
 
     int pid = fork();
-
     if (pid == 0) {
         if (execl(argv[1], argv[1], (char*)NULL) == -1) {
             err(1, "couldnt exec %s", argv[1]);        
         }
-
-        exit(0);
     } 
 
     int status;
