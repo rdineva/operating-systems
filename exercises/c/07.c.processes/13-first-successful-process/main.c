@@ -10,7 +10,7 @@
 #include <stdio.h>
 
 void execute(char* command) {
-    if (execl(command, command, (char*)NULL) == -1) {
+    if (execlp(command, command, (char*)NULL) == -1) {
         err(1, "exec for %s failed", command);
     }
     
@@ -18,7 +18,7 @@ void execute(char* command) {
 }
 
 int main(int argc, char* argv[]) {
-    if (argc - 1 != 2) errx(1, "2 args needed");
+    if (argc != 3) errx(1, "2 args needed");
 
     int pid1 = fork();
     if (pid1 == 0) execute(argv[1]);
@@ -37,4 +37,3 @@ int main(int argc, char* argv[]) {
 
     exit(-1);
 }
-
