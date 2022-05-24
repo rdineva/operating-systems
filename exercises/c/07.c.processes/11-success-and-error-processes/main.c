@@ -11,20 +11,18 @@
 #include <stdio.h>
 
 int main(int argc, char* argv[]) {
-    if (argc < 1) errx(1, "not enough args");
+	if (argc < 2) errx(1, "ERROR: not enough params provided");
 
     int success = 0;
     int failure = 0;
 
-    for (int i = 1; i < argc; i++) {
-        int pid = fork();
+    for (int i = 1; i <= argc; i++) {
+        pid_t pid = fork();
     
         if (pid == 0) {
-            if (execl(argv[i], argv[i], (char*)NULL) == -1) {
+            if (execlp(argv[i], argv[i], (char*)NULL) == -1) {
                 err(1, "exec failed for %s", argv[i]);
             }
-
-            exit(0);
         }
 
         int status;
