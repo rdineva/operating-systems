@@ -13,8 +13,6 @@ void execute(char* command) {
     if (execlp(command, command, (char*)NULL) == -1) {
         err(1, "exec for %s failed", command);
     }
-    
-    exit(0);
 }
 
 int main(int argc, char* argv[]) {
