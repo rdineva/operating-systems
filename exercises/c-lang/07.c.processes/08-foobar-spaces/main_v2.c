@@ -10,7 +10,7 @@
 int main(int argc, char* argv[]) {
 	if (argc != 2) errx(1, "ERROR: 1 param needed");
 
-    int fd;
+    	int fd;
 	if ((fd = open(argv[1], O_RDWR|O_CREAT|O_TRUNC, S_IRWXU)) == -1) {
 		err(1, "%s", argv[1]);
 	}
