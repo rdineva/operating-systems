@@ -15,7 +15,7 @@ int main(int argc, char* argv[]) {
 		err(1, "%s", argv[1]);
 	}
 	
-    pid_t pid = fork();
+    	pid_t pid = fork();
 	int status;
 	if (pid == 0) {
 		if(write(fd,"foobar", 6) != 6) {
