@@ -10,8 +10,8 @@
 int main(int argc, char* argv[]) {
 	if (argc != 4) errx(1, "4 params needed");
 		
-	int fd;
-	if ((fd = open(argv[argc-1], O_WRONLY|O_CREAT|O_TRUNC, S_IRWXU)) == -1) {
+	int fd = open(argv[argc-1], O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
+	if (fd == -1) {
 		err(1, "err %s", argv[argc-1]);
 	}
 
@@ -19,7 +19,6 @@ int main(int argc, char* argv[]) {
 		pid_t pid = fork();	
 		if (pid == 0) {
 			if (execlp(argv[i], argv[i], (char*)NULL) == -1) {
-				close(fd);
 				err(1, "execlp %s", argv[i]);
 			}
 		}
