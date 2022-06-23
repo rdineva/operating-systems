@@ -17,7 +17,7 @@ int main(int argc, char* argv[]) {
     if (pid == 0) {
         close(pf[0]);
         close(1);
-        dup2(pf[1], 1); // !!!!!
+        dup2(pf[1], 1);
 
         if (execl("/bin/cat", "/bin/cat", argv[1], (char*)NULL) == -1) {
             close(pf[1]);
@@ -43,6 +43,8 @@ int main(int argc, char* argv[]) {
 
             byte = byte ^ 0x20; // XOR
         }
+
+		if (byte == 0x55) continue;
 
         if (write(fd, &byte, 1) != 1) {
             close(fd);
